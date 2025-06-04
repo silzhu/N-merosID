@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generador de ID Único</title>
+</head>
+<body>
+  <h1>Haz clic para generar un ID único</h1>
+  <button onclick="generarID()">Generar ID</button>
+  <p id="resultado"></p>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Tu configuración Firebase
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "XXX",
+      appId: "XXX"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function generarID() {
+      let id;
+      let exists = true;
+
+      while (exists) {
+        id = Math.floor(Math.random() * 1000000).toString(); // ID aleatorio
+        const doc = await db.collection("ids").doc(id).get();
+        exists = doc.exists;
+      }
+
+      // Guardar el nuevo ID
+      await db.collection("ids").doc(id).set({
+        createdAt: new Date().toISOString()
+      });
+
+      document.getElementById("resultado").innerText = "Tu ID único es: " + id;
+    }
+  </script>
+</body>
+</html>
